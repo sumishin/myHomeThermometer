@@ -4,6 +4,7 @@ import { History } from 'history';
 import { createStore, Store, Middleware, applyMiddleware } from 'redux';
 import { browserHistory } from 'react-router';
 import { syncHistoryWithStore, routerMiddleware } from 'react-router-redux';
+import * as AWS from 'aws-sdk';
 
 import { AppProvider } from 'src/ts/containers/AppProvider';
 import { appReducers } from 'src/ts/reducers/appReducers';
@@ -11,6 +12,13 @@ import { appReducers } from 'src/ts/reducers/appReducers';
 const appRouterMiddleware: Middleware = routerMiddleware(browserHistory);
 const store: Store = createStore(appReducers, applyMiddleware(appRouterMiddleware));
 const history: History = syncHistoryWithStore(browserHistory, store);
+
+AWS.config.update({
+  region: ENV.awsRegion,
+  credentials: new AWS.CognitoIdentityCredentials({
+    IdentityPoolId: ENV.cognito.identityPoolId
+  })
+});
 
 //api.initialize(store);
 

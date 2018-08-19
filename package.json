@@ -20,8 +20,10 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "amazon-cognito-identity-js": "^2.0.21",
     "apollo-client": "^2.3.5",
     "aws-appsync": "^1.1.4",
+    "aws-sdk": "^2.296.0",
     "graphql-tag": "^2.9.2",
     "moment": "^2.22.2",
     "react": "^16.4.1",
@@ -43,6 +45,7 @@
     "@types/redux": "^3.6.0",
     "css-loader": "^0.28.11",
     "file-loader": "^1.1.11",
+    "json-loader": "^0.5.7",
     "node-sass": "^4.9.2",
     "sass-loader": "^7.0.3",
     "style-loader": "^0.21.0",

@@ -69,6 +69,13 @@ const config = {
           'sass-loader'
         ]
       },
+      // for amazon-cognito-identity-js
+      // https://github.com/aws-amplify/amplify-js/tree/master/packages/amazon-cognito-identity-js
+      {
+        test: /\.json$/,
+        loader: "json-loader",
+        type: 'javascript/auto'
+      },
       //TSLint
       {
         test: /\.tsx?$/,

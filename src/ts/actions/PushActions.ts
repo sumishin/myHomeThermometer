@@ -9,6 +9,13 @@ export function to(path: string): RouterAction {
 }
 
 /**
+ * ログイン画面
+ */
+export function toLogIn(): RouterAction {
+  return push('/logIn');
+}
+
+/**
  * トップ画面
  */
 export function toTop(): RouterAction {

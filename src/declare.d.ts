@@ -6,19 +6,19 @@ declare var ENV: Envelopment;
 
 //環境設定
 declare interface Envelopment {
+  awsRegion: string;
   cognito: CognitoEnvelopment;
-  awsAppSync: AwsAppSyncEnvelopment;
+  appSync: AwsAppSyncEnvelopment;
 }
 
 declare interface CognitoEnvelopment {
-  region: string;
   identityPoolId: string;
+  userPoolId: string;
   clientId: string;
 }
 
 declare interface AwsAppSyncEnvelopment {
   graphqlEndpoint: string;
-  region: string;
 }
 
 //

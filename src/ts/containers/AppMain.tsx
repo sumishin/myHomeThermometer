@@ -6,11 +6,9 @@ import { Dispatch, Action } from 'redux';
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
 
-import { AsyncTaskState, initialAsyncTaskState } from 'src/commonTypes';
 import { StyleableComponent, StyleableComponentProps } from 'src/ts/components/StyleableComponent';
 import { StoreStates } from 'src/ts/reducers/appReducers';
 import { AppContextState } from 'src/ts/reducers/appContextReducer';
-import * as AppContextActions from 'src/ts/actions/AppContext';
 import * as PushActions from 'src/ts/actions/PushActions';
 
 export interface MappedStateProps {
@@ -23,27 +21,16 @@ export interface PathParams {
 }
 
 interface DispatchProps {
-  willMount: () => void;
-  didAuthorized: (taskState: AsyncTaskState) => void;
-  toLogout: () => void;
-  didCanceled: () => void;
-}
-
-interface LocalState {
-  asyncTaskState?: AsyncTaskState;
+  toSignIn: () => void;
 }
 
 export interface AppMainProps extends MappedStateProps, DispatchProps, RouteComponentProps<PathParams, {}>, StyleableComponentProps {
 }
 
-export class AppMainComponent extends StyleableComponent<AppMainProps, LocalState> {
+export class AppMainComponent extends StyleableComponent<AppMainProps, {}> {
 
   constructor(props: AppMainProps, context?: {}) {
     super(props, context);
-
-    this.state = {
-      asyncTaskState: undefined
-    };
   }
 
   public render(): JSX.Element {
@@ -53,10 +40,6 @@ export class AppMainComponent extends StyleableComponent<AppMainProps, LocalStat
       return (
         <div className={this.styles.appMainRoot}>
           読み込み中
-          <pre>
-            {this.props.params.date}
-            {JSON.stringify(ENV, undefined, 2)}
-          </pre>
         </div>
       );
     }
@@ -66,6 +49,7 @@ export class AppMainComponent extends StyleableComponent<AppMainProps, LocalStat
         認証した
         <pre>
           {this.props.params.date}
+          {this.props.app.accessToken}
           {JSON.stringify(ENV, undefined, 2)}
         </pre>
       </div>
@@ -73,26 +57,8 @@ export class AppMainComponent extends StyleableComponent<AppMainProps, LocalStat
   }
 
   public componentWillMount(): void {
-    this.props.willMount();
-  }
-
-  public componentWillReceiveProps(nextProps: AppMainProps, _nextContext: {}): void {
-
-    if (!this.props.app.authenticated && nextProps.app.authenticated) {
-
-      const taskState: AsyncTaskState = {...initialAsyncTaskState};
-      this.setState({ asyncTaskState: taskState });
-      this.props.didAuthorized(taskState);
-      return;
-    }
-  }
-
-  public componentWillUnmount(): void {
-
-    if (this.state.asyncTaskState && !this.state.asyncTaskState.finished) {
-      this.state.asyncTaskState.isCancelRequested = true;
-      this.props.didCanceled();
-      this.setState({ asyncTaskState: undefined });
+    if (!this.props.app.authenticated) {
+      this.props.toSignIn();
     }
   }
 }
@@ -103,18 +69,9 @@ export function mapStateToProps(state: StoreStates): MappedStateProps {
   };
 }
 
-export const authenticate: (dispatch: Dispatch<Action>) => void = (_dispatch) => {
-  console.error('TODO 実装');
-};
-
 export function mapDispatchToProps(dispatch: Dispatch<Action>): DispatchProps {
   return {
-    willMount: () => authenticate(dispatch),
-    didAuthorized: async (_taskState: AsyncTaskState) => {
-      console.error('TODO 実装');
-    },
-    toLogout: () => dispatch(PushActions.toLogout()),
-    didCanceled: () => dispatch(AppContextActions.setFetching(false))
+    toSignIn: () => dispatch(PushActions.toLogIn())
   };
 }
 

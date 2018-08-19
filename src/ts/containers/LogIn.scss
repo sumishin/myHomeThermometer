@@ -1,0 +1,21 @@
+.logInRoot {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100%;
+
+  .emailInput {
+    display: block;
+    margin: 1rem;
+  }
+
+  .passwordInput {
+    display: block;
+    margin: 0 1rem 1rem;
+  }
+
+  .submitInput {
+    display: block;
+    margin: 0 1rem 1rem;
+  }
+}
