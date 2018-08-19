@@ -10,7 +10,7 @@ const fs = require('fs')
 const myTopic = 'topic/dht11';
 const logPath = '/tmp/dht11.json';
 const maxRetryCount = 60;
-const notExistsWaitTime = 1000 * 60 * 60;
+const notExistsWaitTime = 1000 * 60 * 10;
 
 const state = {
   connected: false,
@@ -43,14 +43,17 @@ const sendData = () => {
 }
 
 const watchLog = () => {
-  const watcher = fs.watch(logPath, (event, filename) => {
-    if (filename) {
+  try {
+    const watcher = fs.watch(logPath, (event, filename) => {
       watcher.close();
       setTimeout(sendData, 1000);
-      return;
+    });
+  } catch(e) {
+    // ファイルなし時は時間を置く
+    if (e.code === 'ENOENT') {
+      setTimeout(watchLog, notExistsWaitTime);
     }
-    setTimeout(watchLog, notExistsWaitTime);
-  });
+  }
 }
 
 device.on('connect', () => {
