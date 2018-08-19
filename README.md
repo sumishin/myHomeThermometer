@@ -1,18 +1,6 @@
 # myHomeThermometer
 
-ラズパイ から送信された室温を確認するためのWebアプリです。
-
-## Install
-
-```bash
-npm install
-```
-
-## Usage
-
-```bash
-npm start
-```
+ラズパイから送信された室温を確認するための実験コードです。
 
 ## LICENSE
 
