@@ -250,6 +250,7 @@ ModelManifest.xml
 
 # 環境周り
 **/.envelopment/*
+**/.config.js
 
 # macOS system file
 .DS_Store

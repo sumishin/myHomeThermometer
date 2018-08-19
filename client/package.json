@@ -1,0 +1,19 @@
+{
+  "name": "my_home_thermometer_client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sumishin/myHomeThermometer.git"
+  },
+  "author": "Shingo Sumida",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "aws-iot-device-sdk": "^2.2.1"
+  }
+}
