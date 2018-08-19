@@ -50,7 +50,6 @@ const watchLog = () => {
   } catch(e) {
     // ファイルなし時は空のファイルを書いておく
     if (e.code === 'ENOENT') {
-      fs.writeFileSync(logPath, '{}');
       setTimeout(watchLog, 10000);
     }
   }
