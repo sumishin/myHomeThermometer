@@ -10,7 +10,6 @@ const fs = require('fs')
 const myTopic = 'topic/dht11';
 const logPath = '/tmp/dht11.json';
 const maxRetryCount = 60;
-const notExistsWaitTime = 1000 * 60 * 10;
 
 const state = {
   connected: false,
@@ -49,9 +48,10 @@ const watchLog = () => {
       setTimeout(sendData, 1000);
     });
   } catch(e) {
-    // ファイルなし時は時間を置く
+    // ファイルなし時は空のファイルを書いておく
     if (e.code === 'ENOENT') {
-      setTimeout(watchLog, notExistsWaitTime);
+      fs.writeFileSync(logPath, '{}');
+      setTimeout(watchLog, 10000);
     }
   }
 }
