@@ -244,13 +244,12 @@ ModelManifest.xml
 # ApplicationのLOGフォルダ
 Logs/
 
-# Frontend WebSite の Build ファイルを除外する
+# Build ファイルを除外する
 Frontend/public/dist/*
 Frontend/public/asset/bundle/*
 
-# Frontend WebSite の coverage 情報を除外する
-Frontend/coverage/*
-Frontend/jenkins/*
+# 環境周り
+.envelopment/*
 
 # macOS system file
 .DS_Store

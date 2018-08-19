@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "sourceMap": true,
+    "module": "commonjs",
+    "target": "es5",
+    "jsx": "react",
+    "lib": [
+      "es2015",
+      "dom"
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "src/*": [ "./src/*" ],
+      "test/*": [ "./test/*" ],
+      "es6-promise": [ "node_modules/es6-promise" ]
+    },
+    "allowJs": false,
+    "strict": true,
+    "strictFunctionTypes": false,
+    "importHelpers": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noStrictGenericChecks": false
+  },
+  "exclude": [
+    ".vscode",
+    "node_modules"
+  ]
+}

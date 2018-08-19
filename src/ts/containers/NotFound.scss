@@ -1,0 +1,17 @@
+.notFoundRoot {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  .notFoundReport {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .notFoundMessage {
+      margin: 5rem 0;
+      text-align: center;
+    }
+  }
+}

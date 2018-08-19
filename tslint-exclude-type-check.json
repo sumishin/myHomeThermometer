@@ -1,0 +1,19 @@
+{
+  //
+  // type-check 必須ルールを解除する。
+  //
+  "rules": {
+    "no-cookies": false,
+    "await-promise": false,
+    "no-floating-promises": false,
+    "no-use-before-declare": false,
+    "no-for-in-array": false,
+    "promise-function-async": false,
+    "restrict-plus-operands": false,
+    "no-unnecessary-type-assertion": false,
+    "strict-boolean-expressions": false,
+    "completed-docs": [false],
+    "no-void-expression": false,
+    "use-default-type-parameter": false
+  }
+}
