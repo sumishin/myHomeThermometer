@@ -46,12 +46,7 @@ export class AppMainComponent extends StyleableComponent<AppMainProps, {}> {
 
     return (
       <div className={this.props.styles.appMainRoot}>
-        認証した
-        <pre>
-          {this.props.params.date}
-          {this.props.app.accessToken}
-          {JSON.stringify(ENV, undefined, 2)}
-        </pre>
+        {this.props.children}
       </div>
     );
   }

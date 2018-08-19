@@ -8,6 +8,7 @@ import * as AWS from 'aws-sdk';
 
 import { AppProvider } from 'src/ts/containers/AppProvider';
 import { appReducers } from 'src/ts/reducers/appReducers';
+import { api } from 'src/ts/graphQL/api';
 
 const appRouterMiddleware: Middleware = routerMiddleware(browserHistory);
 const store: Store = createStore(appReducers, applyMiddleware(appRouterMiddleware));
@@ -20,7 +21,7 @@ AWS.config.update({
   })
 });
 
-//api.initialize(store);
+api.initialize(store);
 
 try {
 

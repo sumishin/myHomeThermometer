@@ -144,7 +144,7 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): DispatchProps {
           }
           taskState.finished = true;
 
-          dispatch(AppContextActions.setAccessToken(session.getIdToken().getJwtToken()));
+          dispatch(AppContextActions.setAccessToken(session.getAccessToken().getJwtToken()));
           dispatch(PushActions.toTop());
         },
         onFailure: (err: any) => {

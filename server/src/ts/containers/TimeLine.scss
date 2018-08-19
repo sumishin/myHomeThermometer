@@ -1,0 +1,100 @@
+.timeLineRoot {
+  box-sizing: border-box;
+  padding: 1rem 2rem;
+  min-height: 100%;
+
+  .title {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.25rem;
+    color: #000;
+  }
+
+  .loading {
+    padding: 10rem 0 0;
+  }
+
+  .container {
+    display: -ms-grid;
+    display: grid;
+    box-sizing: border-box;
+    // edge が grid-gap 未対応なので代わりに間に列/行増やしている
+    -ms-grid-columns: 16.5rem 1rem 1fr;
+    grid-template-columns: 16.5rem 1fr;
+    -ms-grid-rows: 1fr;
+    grid-template-rows: 1fr;
+    grid-gap: 1rem;
+    margin: 0;
+    padding: 2.5rem;
+
+    .calendar {
+      -ms-grid-column: 1;
+      grid-column: 1;
+      -ms-grid-row: 1;
+      grid-row: 1;
+    }
+
+    .timeLines {
+      -ms-grid-column: 3;
+      grid-column: 2;
+      -ms-grid-row: 1;
+      grid-row: 1;
+      min-height: 20rem;
+      padding: 2rem 1rem 2rem 3.5rem;
+      background-color: rgba(0, 0, 0, 0.1);
+      position: relative;
+
+      .timeLine {
+        width: 100%;
+        margin: 1rem 0 0;
+
+        h3 {
+          display: flex;
+          align-items: center;
+          margin: 0;
+          font-weight: bold;
+          font-size: 1rem;
+
+          .timestamp {
+            font-size: 0.75rem;
+            color: rgba(0, 0, 0, 0.6);
+            margin: 0 1rem 0 0;
+          }
+        }
+
+        &:first-of-type {
+          margin: 0;
+        }
+
+        &:last-of-type {
+          margin: 1rem 0 1rem;
+        }
+
+        .message {
+          font-size: 0.75rem;
+          margin: 0.5rem 0 0 11.5rem;
+        }
+      }
+
+      .nonTimeLine {
+        color: #000;
+        font-weight: bold;
+        text-align: center;
+        width: 100%;
+        box-sizing: border-box;
+        margin: 0 0 0 -1.5rem;
+      }
+
+      .moreTimeline {
+        width: 100%;
+        text-align: center;
+        margin: 1.75rem 0 0;
+
+        .moreButton {
+          display: block;
+          width: 12rem;
+          height: 2rem;
+        }
+      }
+    }
+  }
+}

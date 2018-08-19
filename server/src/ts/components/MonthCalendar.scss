@@ -1,0 +1,51 @@
+.monthCalendarRoot {
+  text-align: center;
+
+  .yearContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+
+    .year {
+      font-size: 1.25rem;
+    }
+
+    .forwardToOneYearButton,
+    .backToOneYearButton {
+      color: #000;
+
+      &:disabled {
+        color: rgba(0, 0, 0, 0.3);
+      }
+    }
+  }
+
+  .monthContainer {
+    display: -ms-grid;
+    display: grid;
+    box-sizing: border-box;
+    // edge が grid-gap 未対応なので代わりに間に列/行増やしている、レイアウトが変わると調整が必要なので注意!
+    -ms-grid-columns: 1fr 1rem 1fr;
+    grid-template-columns: 1fr 1fr;
+    -ms-grid-rows: 1fr 1rem 1fr 1rem 1fr 1rem 1fr 1rem 1fr 1rem 1fr;
+    grid-gap: 1rem;
+    margin: 1rem 0 0;
+
+    .currentButton {
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.7);
+      color: #fff;
+
+      div {
+        font-weight: bold;
+      }
+    }
+
+    .otherButton {
+      width: 100%;
+      background-color: rgba(0, 0, 0, 0.1);
+      color: #000;
+    }
+  }
+}
