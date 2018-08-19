@@ -242,14 +242,14 @@ ModelManifest.xml
 .fake/
 
 # ApplicationのLOGフォルダ
-Logs/
+**/Logs/
 
 # Build ファイルを除外する
-Frontend/public/dist/*
-Frontend/public/asset/bundle/*
+**/public/dist/*
+**/public/asset/bundle/*
 
 # 環境周り
-.envelopment/*
+**/.envelopment/*
 
 # macOS system file
 .DS_Store
