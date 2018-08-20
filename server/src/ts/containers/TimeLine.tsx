@@ -64,17 +64,17 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
     this.onClickMoreButton = this.onClickMoreButton.bind(this);
   }
 
-  private getYYYYMM(): string {
-    if (this.props.params.yyyymm) {
-      return this.props.params.yyyymm;
+  private getYYYYMM(target: TimeLineProps): string {
+    if (target.params.yyyymm) {
+      return target.params.yyyymm;
     }
 
     const now: moment.Moment = moment();
     return now.format('YYYYMM');
   }
 
-  private getDeviceName(): string {
-    return `myRaspberryPi3_${this.getYYYYMM()}`;
+  private getDeviceName(target: TimeLineProps): string {
+    return `myRaspberryPi3_${this.getYYYYMM(target)}`;
   }
 
   private onClickCalenderMonth(year: number, month: number): void {
@@ -94,7 +94,7 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
 
     const taskState: AsyncTaskState = {...initialAsyncTaskState};
     this.props.fetchMoreTimeLine(
-      this.getDeviceName(),
+      this.getDeviceName(this.props),
       PAGE_SIZE,
       this.props.app.lastTimestamp,
       taskState);
@@ -103,7 +103,7 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
 
   private renderCalendar(): JSX.Element {
 
-    const yyyymm: appUtil.YYYYMM = appUtil.parseYYYYMM(this.getYYYYMM());
+    const yyyymm: appUtil.YYYYMM = appUtil.parseYYYYMM(this.getYYYYMM(this.props));
     return (
       <div className={this.props.styles.calendar}>
         <MonthCalendar year={yyyymm.yyyy}
@@ -158,7 +158,7 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
       );
     }
 
-    const yyyymm: appUtil.YYYYMM = appUtil.parseYYYYMM(this.getYYYYMM());
+    const yyyymm: appUtil.YYYYMM = appUtil.parseYYYYMM(this.getYYYYMM(this.props));
     if (this.props.app.timeline.length === 0) {
       return (
         <div className={this.props.styles.timeLines}>
@@ -213,14 +213,14 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
 
   public componentWillMount(): void {
 
-    if (!appUtil.isValidYearAndMonthString(this.getYYYYMM())) {
+    if (!appUtil.isValidYearAndMonthString(this.getYYYYMM(this.props))) {
       window.location.assign('/fatalError.html');
       return;
     }
 
     const taskState: AsyncTaskState = {...initialAsyncTaskState};
     this.props.fetchTimeLine(
-      this.getDeviceName(),
+      this.getDeviceName(this.props),
       PAGE_SIZE,
       taskState);
     this.setState({ asyncTaskState: taskState });
@@ -248,7 +248,7 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
 
       const taskState: AsyncTaskState = {...initialAsyncTaskState};
       this.props.fetchTimeLine(
-        this.getDeviceName(),
+        this.getDeviceName(nextProps),
         PAGE_SIZE,
         taskState);
       this.setState({ asyncTaskState: taskState });
