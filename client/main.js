@@ -30,8 +30,12 @@ const sendData = () => {
 
   try {
     const data = fs.readFileSync(logPath, 'utf8');
-    device.publish(myTopic, data);
-    state.retryCount = 0;
+    if (!data.error) {
+      device.publish(myTopic, data);
+      state.retryCount = 0;
+    } else {
+      console.error(data);
+    }
   } catch (e) {
     console.error(e);
     state.retryCount++;
