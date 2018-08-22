@@ -25,9 +25,10 @@ export function toTop(): RouterAction {
 /**
  * タイムライン
  */
-export function replaceTimeLine(year: number, month: number): RouterAction {
+export function replaceTimeLine(year: number, month: number, day: number): RouterAction {
   const pathMonth: string = 9 < month ? month.toString() : `0${month}`;
-  return replace(`/timeline/${year}${pathMonth}`);
+  const pathDay: string = 9 < day ? day.toString() : `0${day}`;
+  return replace(`/timeline/${year}${pathMonth}${pathDay}`);
 }
 
 /**

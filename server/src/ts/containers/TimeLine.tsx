@@ -8,13 +8,14 @@ import { RouteComponentProps } from 'react-router';
 import { ApolloQueryResult } from 'apollo-client';
 import { connect } from 'react-redux';
 import * as moment from 'moment';
+import * as ja from 'date-fns/locale/ja';
+import InfiniteCalendar from 'react-infinite-calendar';
 
 import { StoreStates } from 'src/ts/reducers/appReducers';
 import { AsyncTaskState, initialAsyncTaskState } from 'src/commonTypes';
 import { AppContextState } from 'src/ts/reducers/appContextReducer';
 import { StyleableComponent, StyleableComponentProps } from 'src/ts/components/StyleableComponent';
 import { LineChart, LineChartData } from 'src/ts/components/LineChart';
-import { MonthCalendar } from 'src/ts/components/MonthCalendar';
 import { api } from 'src/ts/graphQL/api';
 import * as GQL from 'src/ts/graphQL/query/dailyHomeThermometers';
 import { MyHomeThermometer } from 'src/ts/graphQL/types';
@@ -22,18 +23,20 @@ import { appUtil } from 'src/appUtil';
 import * as AppContextActions from 'src/ts/actions/AppContext';
 import * as PushActions from 'src/ts/actions/PushActions';
 
+const MIN_DATE: Date = moment('20180801').toDate();
+
 export interface MappedStateProps {
   app: AppContextState;
 }
 
 // react-routerのパスで指定されたパラメタ
 export interface PathParams {
-  yyyymm?: string;
+  yyyymmdd?: string;
 }
 
 interface DispatchProps {
   fetchTimeLine: (deviceName: string, fromTimeStamp: number, toTimeStamp: number, asyncTaskState: AsyncTaskState) => void;
-  replacePath: (year: number, month: number) => void;
+  replacePath: (year: number, month: number, day: number) => void;
   didCanceled: () => void;
 }
 
@@ -54,43 +57,49 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
       endOfTimeLine: false
     };
 
-    this.onClickCalenderMonth = this.onClickCalenderMonth.bind(this);
+    this.onSelectInfiniteCalendar = this.onSelectInfiniteCalendar.bind(this);
   }
 
-  private getYYYYMM(target: TimeLineProps): string {
-    if (target.params.yyyymm) {
-      return target.params.yyyymm;
+  private getYYYYMMDD(target: TimeLineProps): string {
+    if (target.params.yyyymmdd) {
+      return target.params.yyyymmdd;
     }
 
     const now: moment.Moment = moment();
-    return now.format('YYYYMM');
+    return now.format('YYYYMMDD');
   }
 
   private getDeviceName(target: TimeLineProps): string {
-    return `myRaspberryPi3_${this.getYYYYMM(target)}`;
+    const yyyymmdd: appUtil.YYYYMMDD = appUtil.parseYYYYMMDD(this.getYYYYMMDD(target));
+    const mmStr: string = 10 < yyyymmdd.mm ? yyyymmdd.mm.toString() : `0${yyyymmdd.mm}`;
+    return `myRaspberryPi3_${yyyymmdd.yyyy}${mmStr}`;
   }
 
   private timestampToString(timestamp: number): string {
-    return moment.unix(timestamp).local().format('DD日 HH:mm:ss');
+    return moment.unix(timestamp).local().format('HH:mm');
   }
 
-  private onClickCalenderMonth(year: number, month: number): void {
-
-    this.props.replacePath(
-      year,
-      month
-    );
+  private onSelectInfiniteCalendar(date: string): void {
+    const mDate: moment.Moment = moment(date);
+    this.props.replacePath(mDate.year(), mDate.month() + 1, mDate.date());
   }
 
   private renderCalendar(): JSX.Element {
 
-    const yyyymm: appUtil.YYYYMM = appUtil.parseYYYYMM(this.getYYYYMM(this.props));
+    const yyyymmdd: appUtil.YYYYMMDD = appUtil.parseYYYYMMDD(this.getYYYYMMDD(this.props));
+    const selected: Date = new Date(yyyymmdd.yyyy, yyyymmdd.mm - 1, yyyymmdd.dd);
+    //tslint:disable-next-line
+    const locale: any = { locale: ja };
     return (
       <div className={this.props.styles.calendar}>
-        <MonthCalendar
-          year={yyyymm.yyyy}
-          month={yyyymm.mm}
-          onClick={this.onClickCalenderMonth} />
+        <InfiniteCalendar
+            width={400}
+            height={400}
+            selected={selected}
+            minDate={MIN_DATE}
+            locale={locale}
+            onSelect={this.onSelectInfiniteCalendar}
+          />
       </div>
     );
   }
@@ -151,12 +160,12 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
       );
     }
 
-    const yyyymm: appUtil.YYYYMM = appUtil.parseYYYYMM(this.getYYYYMM(this.props));
+    const yyyymmdd: appUtil.YYYYMMDD = appUtil.parseYYYYMMDD(this.getYYYYMMDD(this.props));
     if (this.props.app.timeline.length === 0) {
       return (
         <div className={this.props.styles.timeLines}>
           <div className={this.props.styles.nonTimeLine}>
-            {`${yyyymm.mm}月の記録はありません`}
+            {`${yyyymmdd.mm}月${yyyymmdd.dd}日の記録はありません`}
           </div>
         </div>
       );
@@ -171,14 +180,6 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
   }
 
   private renderBody(): JSX.Element {
-
-    if (this.props.app.isFetching) {
-      return (
-        <div className={this.props.styles.loading}>
-          読み込み中
-        </div>
-      );
-    }
 
     return (
       <div className={this.props.styles.container}>
@@ -197,7 +198,7 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
 
     return (
       <section className={this.styles.timeLineRoot}>
-        {!this.props.app.isFetching && <h2 className={this.props.styles.title}>温度/湿度</h2>}
+        <h2 className={this.props.styles.title}>温度/湿度</h2>
         {this.renderBody()}
       </section>
     );
@@ -205,16 +206,17 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
 
   public componentWillMount(): void {
 
-    if (!appUtil.isValidYearAndMonthString(this.getYYYYMM(this.props))) {
+    if (!appUtil.isValidDateString(this.getYYYYMMDD(this.props))) {
       window.location.assign('/fatalError.html');
       return;
     }
 
     const taskState: AsyncTaskState = {...initialAsyncTaskState};
+    const date: moment.Moment = moment(this.props.params.yyyymmdd);
     this.props.fetchTimeLine(
       this.getDeviceName(this.props),
-      moment('2018-08-20').unix(),
-      moment('2018-08-23').unix(),
+      date.unix(),
+      date.add(1, 'day').unix(),
       taskState);
     this.setState({ asyncTaskState: taskState });
   }
@@ -226,7 +228,7 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
   public componentWillReceiveProps(nextProps: TimeLineProps, _nextContext: {}): void {
 
     // パスの値が変わっていれば初回読み込み処理
-    if (nextProps.params.yyyymm && this.props.params.yyyymm !== nextProps.params.yyyymm) {
+    if (nextProps.params.yyyymmdd && this.props.params.yyyymmdd !== nextProps.params.yyyymmdd) {
 
       if (this.state.asyncTaskState) {
         this.state.asyncTaskState.isCancelRequested = true;
@@ -234,16 +236,17 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
 
       window.scrollTo(0, 0);
 
-      if (!appUtil.isValidYearAndMonthString(nextProps.params.yyyymm)) {
+      if (!appUtil.isValidDateString(nextProps.params.yyyymmdd)) {
         window.location.assign('/fatalError.html');
         return;
       }
 
       const taskState: AsyncTaskState = {...initialAsyncTaskState};
+      const date: moment.Moment = moment(nextProps.params.yyyymmdd);
       this.props.fetchTimeLine(
         this.getDeviceName(nextProps),
-        moment('2018-08-20').unix(),
-        moment('2018-08-23').unix(),
+        date.unix(),
+        date.add(1, 'day').unix(),
         taskState);
       this.setState({ asyncTaskState: taskState });
     }
@@ -311,8 +314,8 @@ export function mapDispatchToProps(dispatch: Dispatch<Action>): DispatchProps {
     fetchTimeLine: (deviceName: string, fromTimeStamp: number, toTimeStamp: number, asyncTaskState: AsyncTaskState) => {
       _fetchTimeLine(dispatch, deviceName, fromTimeStamp, toTimeStamp, asyncTaskState);
     },
-    replacePath: (year: number, month: number) => {
-      dispatch(PushActions.replaceTimeLine(year, month));
+    replacePath: (year: number, month: number, day: number) => {
+      dispatch(PushActions.replaceTimeLine(year, month, day));
     },
     didCanceled: () => {
       dispatch(AppContextActions.setData([]));

@@ -30,7 +30,7 @@ class AppProviderComponent extends React.Component<AppProviderProps, {}> {
           <Route path='/logout' component={Logout} />
           <Route path='/' component={AppMain} >
             <IndexRoute component={TimeLine} />
-            <Route path='/timeline/:yyyymm' component={TimeLine} />
+            <Route path='/timeline/:yyyymmdd' component={TimeLine} />
           </Route>
           <Route path='/*' component={NotFound} />
         </Router>
