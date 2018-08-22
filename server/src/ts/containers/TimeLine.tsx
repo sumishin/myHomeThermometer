@@ -16,13 +16,11 @@ import { StyleableComponent, StyleableComponentProps } from 'src/ts/components/S
 import { LineChart, LineChartData } from 'src/ts/components/LineChart';
 import { MonthCalendar } from 'src/ts/components/MonthCalendar';
 import { api } from 'src/ts/graphQL/api';
-import * as GQL from 'src/ts/graphQL/query/myHomeThermometers';
+import * as GQL from 'src/ts/graphQL/query/dailyHomeThermometers';
 import { MyHomeThermometer } from 'src/ts/graphQL/types';
 import { appUtil } from 'src/appUtil';
 import * as AppContextActions from 'src/ts/actions/AppContext';
 import * as PushActions from 'src/ts/actions/PushActions';
-
-const PAGE_SIZE: number = 10;
 
 export interface MappedStateProps {
   app: AppContextState;
@@ -34,12 +32,7 @@ export interface PathParams {
 }
 
 interface DispatchProps {
-  fetchTimeLine: (deviceName: string, limit: number, asyncTaskState: AsyncTaskState) => void;
-  fetchMoreTimeLine: (
-    deviceName: string,
-    limit: number,
-    nextTimeStamp: number,
-    asyncTaskState: AsyncTaskState) => void;
+  fetchTimeLine: (deviceName: string, fromTimeStamp: number, toTimeStamp: number, asyncTaskState: AsyncTaskState) => void;
   replacePath: (year: number, month: number) => void;
   didCanceled: () => void;
 }
@@ -62,7 +55,6 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
     };
 
     this.onClickCalenderMonth = this.onClickCalenderMonth.bind(this);
-    this.onClickMoreButton = this.onClickMoreButton.bind(this);
   }
 
   private getYYYYMM(target: TimeLineProps): string {
@@ -80,22 +72,6 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
 
   private timestampToString(timestamp: number): string {
     return moment.unix(timestamp).local().format('DD日 HH:mm:ss');
-  }
-
-  private onClickMoreButton(e: React.MouseEvent<{}>): void {
-    e.preventDefault();
-
-    if (typeof(this.props.app.lastTimestamp) !== 'number') {
-      throw Error('想定外');
-    }
-
-    const taskState: AsyncTaskState = {...initialAsyncTaskState};
-    this.props.fetchMoreTimeLine(
-      this.getDeviceName(this.props),
-      PAGE_SIZE,
-      this.props.app.lastTimestamp,
-      taskState);
-    this.setState({ asyncTaskState: taskState });
   }
 
   private onClickCalenderMonth(year: number, month: number): void {
@@ -163,25 +139,6 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
     );
   }
 
-  private renderMoreTimeLine(): JSX.Element {
-    if (this.props.app.isMoreFetching) {
-      return (
-        <div className={this.props.styles.moreTimeline}>
-          読み込み中
-        </div>
-      );
-    }
-
-    return (
-      <div className={this.props.styles.moreTimeline}>
-        <button className={this.props.styles.moreButton}
-                onClick={this.onClickMoreButton}>
-          もっと読み込む
-        </button>
-      </div>
-    );
-  }
-
   private renderTimeLines(): JSX.Element {
 
     if (this.props.app.isFetching) {
@@ -205,12 +162,10 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
       );
     }
 
-    const hasNextPage: boolean = typeof(this.props.app.lastTimestamp) === 'number';
     return (
       <div className={this.props.styles.timeLines}>
         {this.renderChart()}
         {this.props.app.timeline.map((t, i) => this.renderTimeLine(t, `timeline-${i}`))}
-        {hasNextPage ? this.renderMoreTimeLine() : null}
         </div>
     );
   }
@@ -258,7 +213,8 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
     const taskState: AsyncTaskState = {...initialAsyncTaskState};
     this.props.fetchTimeLine(
       this.getDeviceName(this.props),
-      PAGE_SIZE,
+      moment('2018-08-20').unix(),
+      moment('2018-08-23').unix(),
       taskState);
     this.setState({ asyncTaskState: taskState });
   }
@@ -286,7 +242,8 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
       const taskState: AsyncTaskState = {...initialAsyncTaskState};
       this.props.fetchTimeLine(
         this.getDeviceName(nextProps),
-        PAGE_SIZE,
+        moment('2018-08-20').unix(),
+        moment('2018-08-23').unix(),
         taskState);
       this.setState({ asyncTaskState: taskState });
     }
@@ -308,49 +265,13 @@ export function mapStateToProps(state: StoreStates): MappedStateProps {
   };
 }
 
-const _fetchMoreTimeLine: (
+const _fetchTimeLine: (
   dispatch: Dispatch<Action>,
   deviceName: string,
-  limit: number,
-  nextTimeStamp: number,
+  fromTimeStamp: number,
+  toTimeStamp: number,
   asyncTaskState: AsyncTaskState) => void
-  = async (dispatch, deviceName, limit, nextTimeStamp, taskState) => {
-  dispatch(AppContextActions.setMoreFetching(true));
-  try {
-    const result: ApolloQueryResult<GQL.Result>
-      = await api.query<GQL.Result>({
-        query: GQL.Query,
-        variables: {
-          deviceName: deviceName,
-          limit: limit,
-          nextTimeStamp: nextTimeStamp
-        }
-      });
-    const validResult: boolean = api.isValidQueryResult(taskState, result, () => {
-      console.error(result.errors);
-      window.location.assign('/fatalError.html');
-    });
-    if (!validResult) {
-      return;
-    }
-    const data: GQL.Result = result.data;
-    const timeLine: MyHomeThermometer[] = data.myHomeThermometers;
-    dispatch(AppContextActions.addData(timeLine));
-  } catch (e) {
-    console.error(e);
-    api.commonQueryErrorPostProcess(taskState, e, () => {
-      window.location.assign('/fatalError.html');
-    });
-  } finally {
-    if (!taskState.isCancelRequested) {
-      dispatch(AppContextActions.setMoreFetching(false));
-    }
-    taskState.finished = true;
-  }
-};
-
-const _fetchTimeLine: (dispatch: Dispatch<Action>, deviceName: string, limit: number, asyncTaskState: AsyncTaskState) => void
-  = async (dispatch, deviceName, limit, taskState) => {
+  = async (dispatch, deviceName, fromTimeStamp, toTimeStamp, taskState) => {
   dispatch(AppContextActions.setFetching(true));
   try {
     const result: ApolloQueryResult<GQL.Result>
@@ -358,7 +279,8 @@ const _fetchTimeLine: (dispatch: Dispatch<Action>, deviceName: string, limit: nu
         query: GQL.Query,
         variables: {
           deviceName: deviceName,
-          limit: limit
+          fromTimeStamp: fromTimeStamp,
+          toTimeStamp: toTimeStamp
         }
       });
     const validResult: boolean = api.isValidQueryResult(taskState, result, () => {
@@ -369,7 +291,7 @@ const _fetchTimeLine: (dispatch: Dispatch<Action>, deviceName: string, limit: nu
       return;
     }
     const data: GQL.Result = result.data;
-    const timeLine: MyHomeThermometer[] = data.myHomeThermometers;
+    const timeLine: MyHomeThermometer[] = data.dailyHomeThermometers;
     dispatch(AppContextActions.setData(timeLine));
   } catch (e) {
     console.error(e);
@@ -386,15 +308,8 @@ const _fetchTimeLine: (dispatch: Dispatch<Action>, deviceName: string, limit: nu
 
 export function mapDispatchToProps(dispatch: Dispatch<Action>): DispatchProps {
   return {
-    fetchTimeLine: (deviceName: string, limit: number, asyncTaskState: AsyncTaskState) => {
-      _fetchTimeLine(dispatch, deviceName, limit, asyncTaskState);
-    },
-    fetchMoreTimeLine: (
-      deviceName: string,
-      limit: number,
-      nextTimeStamp: number,
-      asyncTaskState: AsyncTaskState) => {
-      _fetchMoreTimeLine(dispatch, deviceName, limit, nextTimeStamp, asyncTaskState);
+    fetchTimeLine: (deviceName: string, fromTimeStamp: number, toTimeStamp: number, asyncTaskState: AsyncTaskState) => {
+      _fetchTimeLine(dispatch, deviceName, fromTimeStamp, toTimeStamp, asyncTaskState);
     },
     replacePath: (year: number, month: number) => {
       dispatch(PushActions.replaceTimeLine(year, month));
