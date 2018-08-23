@@ -120,14 +120,14 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
           title='温度'
           strokeColor='#ff3300'
           yDataKey='temperature'
-          domain={[0, 50]}
+          yDomain={[0, 50]}
           dataList={dataList}
           />
         <LineChart
           title='湿度'
           strokeColor='#6600ff'
           yDataKey='humidity'
-          domain={[0, 100]}
+          yDomain={[0, 100]}
           dataList={dataList}
           />
       </div>
@@ -212,7 +212,7 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
     }
 
     const taskState: AsyncTaskState = {...initialAsyncTaskState};
-    const date: moment.Moment = moment(this.props.params.yyyymmdd);
+    const date: moment.Moment = moment(this.getYYYYMMDD(this.props));
     this.props.fetchTimeLine(
       this.getDeviceName(this.props),
       date.unix(),
