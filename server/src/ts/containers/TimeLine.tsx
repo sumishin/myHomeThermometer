@@ -58,6 +58,7 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
     };
 
     this.onSelectInfiniteCalendar = this.onSelectInfiniteCalendar.bind(this);
+    this.onClickReload = this.onClickReload.bind(this);
   }
 
   private getYYYYMMDD(target: TimeLineProps): string {
@@ -82,6 +83,19 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
   private onSelectInfiniteCalendar(date: string): void {
     const mDate: moment.Moment = moment(date);
     this.props.replacePath(mDate.year(), mDate.month() + 1, mDate.date());
+  }
+
+  private onClickReload(e: React.MouseEvent<{}>): void {
+    e.preventDefault();
+
+    const taskState: AsyncTaskState = {...initialAsyncTaskState};
+    const date: moment.Moment = moment(this.getYYYYMMDD(this.props));
+    this.props.fetchTimeLine(
+      this.getDeviceName(this.props),
+      date.unix(),
+      date.add(1, 'day').unix(),
+      taskState);
+    this.setState({ asyncTaskState: taskState });
   }
 
   private renderCalendar(): JSX.Element {
@@ -189,6 +203,19 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
     );
   }
 
+  private renderReloadButton(): JSX.Element {
+
+    return (
+      <button
+        className={this.styles.reloadButton}
+        onClick={this.onClickReload}
+        disabled={this.props.app.isFetching}
+        >
+        再読み込み
+      </button>
+    );
+  }
+
   public render(): JSX.Element | null {
 
     // 未設定時はAppMainで強制的に設定される為、このコンポーネントでは未設定時は無視
@@ -198,7 +225,7 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
 
     return (
       <section className={this.styles.timeLineRoot}>
-        <h2 className={this.props.styles.title}>温度/湿度</h2>
+        <h2 className={this.styles.title}>温度/湿度{this.renderReloadButton()}</h2>
         {this.renderBody()}
       </section>
     );
