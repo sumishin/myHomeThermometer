@@ -18,8 +18,8 @@
     display: grid;
     box-sizing: border-box;
     // edge が grid-gap 未対応なので代わりに間に列/行増やしている
-    -ms-grid-columns: 25rem 1rem 1fr;
-    grid-template-columns: 25rem 1fr;
+    -ms-grid-columns: 22rem 1rem 1fr;
+    grid-template-columns: 22rem 1fr;
     -ms-grid-rows: 1fr;
     grid-template-rows: 1fr;
     grid-gap: 1rem;
@@ -39,17 +39,12 @@
       -ms-grid-row: 1;
       grid-row: 1;
       min-height: 20rem;
-      padding: 0 1rem 2rem 3.5rem;
+      padding: 0 1rem 2rem;
       background-color: rgba(0, 0, 0, 0.1);
       position: relative;
 
-      .charts {
-        margin: 0 0 1rem 0;
-      }
-
       .timeLine {
         width: 100%;
-        margin: 1rem 0 0;
 
         h3 {
           display: flex;
@@ -70,7 +65,7 @@
         }
 
         &:last-of-type {
-          margin: 1rem 0 1rem;
+          margin: 0 0 1rem;
         }
 
         .message {
@@ -86,18 +81,6 @@
         width: 100%;
         box-sizing: border-box;
         margin: 0 0 0 -1.5rem;
-      }
-
-      .moreTimeline {
-        width: 100%;
-        text-align: center;
-        margin: 1.75rem 0 0;
-
-        .moreButton {
-          display: block;
-          width: 12rem;
-          height: 2rem;
-        }
       }
     }
   }

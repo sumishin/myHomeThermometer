@@ -73,7 +73,7 @@ export class LineChartComponent extends StyleableComponent<LineChartProps, {}> {
       <section className={this.props.styles.lineChartRoot}>
         <h3>{this.props.title}</h3>
         <Recharts.LineChart
-          width={600}
+          width={568}
           height={300}
           data={data}
           margin={{top: 5, right: 30, left: 20, bottom: 5}}

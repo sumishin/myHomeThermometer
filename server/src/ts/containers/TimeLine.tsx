@@ -93,7 +93,7 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
     return (
       <div className={this.props.styles.calendar}>
         <InfiniteCalendar
-            width={400}
+            width={352}
             height={400}
             selected={selected}
             minDate={MIN_DATE}
@@ -136,7 +136,7 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
 
   private renderTimeLine(t: MyHomeThermometer, key: string): JSX.Element {
     const summary: string = `温度:${t.payload.temperature}, 湿度${t.payload.humidity}`;
-    const timestamp: string = moment.unix(t.timestamp).local().format('DD日 HH:mm:ss');
+    const timestamp: string = moment.unix(t.timestamp).local().format('HH:mm:ss');
 
     return (
       <article className={this.props.styles.timeLine} key={key}>
