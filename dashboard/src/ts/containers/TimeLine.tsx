@@ -72,7 +72,7 @@ export class TimeLineComponent extends StyleableComponent<TimeLineProps, LocalSt
 
   private getDeviceName(target: TimeLineProps): string {
     const yyyymmdd: appUtil.YYYYMMDD = appUtil.parseYYYYMMDD(this.getYYYYMMDD(target));
-    const mmStr: string = 10 < yyyymmdd.mm ? yyyymmdd.mm.toString() : `0${yyyymmdd.mm}`;
+    const mmStr: string = 9 < yyyymmdd.mm ? yyyymmdd.mm.toString() : `0${yyyymmdd.mm}`;
     return `myRaspberryPi3_${yyyymmdd.yyyy}${mmStr}`;
   }
 
