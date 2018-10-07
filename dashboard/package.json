@@ -1,5 +1,5 @@
 {
-  "name": "my_home_thermometer",
+  "name": "my_home_thermometer_dashboard",
   "version": "1.0.0",
   "description": "",
   "main": "public/dist/bundle.js",
